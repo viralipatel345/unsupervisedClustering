@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Model Test Results</h2>
+
+{% if predictions %}
+    <p>Cluster predictions for your data:</p>
+    <ul>
+    {% for prediction in predictions %}
+        <li>Cluster: {{ prediction }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No predictions to display.</p>
+{% endif %}
+
+<a href="{% url 'test_model' %}">Test Another Model</a>
+{% endblock %}

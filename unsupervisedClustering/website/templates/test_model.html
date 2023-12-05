@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Test Your Model</h2>
+<form method="post" enctype="multipart/form-data" action="{% url 'test_model' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Test Model</button>
+</form>
+
+{% endblock %}

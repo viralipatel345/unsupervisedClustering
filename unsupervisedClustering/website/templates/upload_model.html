@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Upload Model</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.model_name.label_tag }} {{ form.model_name }}
+    <br>
+    {{ form.scores_file.label_tag }} {{ form.scores_file }}
+    <br>
+    {{ form.scores_text.label_tag }} {{ form.scores_text }}
+    <br>
+    <button type="submit">Upload Model</button>
+</form>
+{% endblock %}
