@@ -1,19 +1,26 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6 m-auto">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Model Test Results</h2>
+                    {% if image_base64 %}
+                            <div class="text-center mt-4">
+                                <img src="data:image/png;base64,{{ image_base64 }}" alt="Cluster Plot" style="max-width: 100%; height: auto;">
+                            </div>
+                    {% else %}
+                        <p class="text-center">No predictions to display.</p>
+                    {% endif %}
 
-<h2>Model Test Results</h2>
-
-{% if predictions %}
-    <p>Cluster predictions for your data:</p>
-    <ul>
-    {% for prediction in predictions %}
-        <li>Cluster: {{ prediction }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No predictions to display.</p>
-{% endif %}
-
-<a href="{% url 'test_model' %}">Test Another Model</a>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'test_model' %}" class="btn btn-primary">Test Another Model</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

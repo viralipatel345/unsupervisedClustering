@@ -1,15 +1,57 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Upload Model</h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.model_name.label_tag }} {{ form.model_name }}
-    <br>
-    {{ form.scores_file.label_tag }} {{ form.scores_file }}
-    <br>
-    {{ form.scores_text.label_tag }} {{ form.scores_text }}
-    <br>
-    <button type="submit">Upload Model</button>
-</form>
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6 m-auto">
+        <div class="card border-0 shadow">
+        <div class="card-body">
+            <h2 class="text-center mb-4">Upload Model</h2>
+            <form id="testModelForm" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_model_name" class="form-label">{{ form.model_name.label }}</label>
+                    <input type="text" name="model_name" class="form-control" id="id_model_name" value="{{ form.model_name.value|default_if_none:'' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="id_scores_file" class="form-label">{{ form.scores_file.label }}</label>
+                    <input type="file" name="scores_file" class="form-control" id="id_scores_file">
+                </div>
+                    <div class="mb-3">
+                        <label for="id_scores_text" class="form-label">{{ form.scores_text.label }}</label>
+                        <textarea name="scores_text" class="form-control" id="id_scores_text">{{ form.scores_text.value|default_if_none:'' }}</textarea>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary me-2">Train Model</button>
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('testModelForm').addEventListener('submit', function(e) {
+        var fileInput = document.getElementById('id_test_scores_file');
+        var textArea = document.getElementById('id_test_scores_text');
+        var modelChoice = document.getElementById('id_model_choice');
+
+        var fileSelected = fileInput.files.length > 0;
+        var textEntered = textArea.value.trim() !== '';
+        var modelSelected = modelChoice.value !== '';
+
+        if ((fileSelected && textEntered) || (!fileSelected && !textEntered)) {
+            alert('Please provide either a file or scores text.');
+            e.preventDefault();
+        }
+
+        if (!modelSelected) {
+            alert('Please select a model to test.');
+            e.preventDefault();
+        }
+    });
+</script>
+
 {% endblock %}

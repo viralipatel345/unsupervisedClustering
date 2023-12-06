@@ -1,11 +1,63 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Test Your Model</h2>
-<form method="post" enctype="multipart/form-data" action="{% url 'test_model' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Test Model</button>
-</form>
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-md-8 col-lg-6 m-auto">
+        <div class="card border-0 shadow">
+        <div class="card-body">
+            <h2 class="text-center mb-4">Test Your Model</h2>
+            <form id="testModelForm" method="post" enctype="multipart/form-data" action="{% url 'test_model' %}">
+                {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_test_scores_file" class="form-label">{{ form.test_scores_file.label }}</label>
+                        <input type="file" name="test_scores_file" class="form-control" id="id_test_scores_file">
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_test_scores_text" class="form-label">{{ form.test_scores_text.label }}</label>
+                        <textarea name="test_scores_text" class="form-control" id="id_test_scores_text">{{ form.test_scores_text.value|default_if_none:'' }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_model_choice" class="form-label">{{ form.model_choice.label }}</label>
+                        <select name="model_choice" class="form-control" id="id_model_choice">
+                            {% for choice in form.model_choice %}
+                                <option value="{{ choice.data.value }}" {% if choice.data.selected %} selected {% endif %}>{{ choice.data.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary me-2">Test Model</button>
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+                    </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('testModelForm').addEventListener('submit', function(e) {
+        var fileInput = document.getElementById('id_test_scores_file');
+        var textArea = document.getElementById('id_test_scores_text');
+        var modelChoice = document.getElementById('id_model_choice');
+
+        var fileSelected = fileInput.files.length > 0;
+        var textEntered = textArea.value.trim() !== '';
+        var modelSelected = modelChoice.value !== '';
+
+        if ((fileSelected && textEntered) || (!fileSelected && !textEntered)) {
+            alert('Please provide either a file or scores text.');
+            e.preventDefault();
+        }
+
+        if (!modelSelected) {
+            alert('Please select a model to test.');
+            e.preventDefault();
+        }
+    });
+</script>
 
 {% endblock %}
+
+

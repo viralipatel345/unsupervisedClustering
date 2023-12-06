@@ -16,7 +16,6 @@ class UserInformation(models.Model):
 class UserModel(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     model_name = models.CharField(max_length=100)
-    scores = models.TextField()
     kmeans_centers = models.JSONField(null=True)
     model_file = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
