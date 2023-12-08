@@ -14,6 +14,17 @@
                     <input type="text" name="model_name" class="form-control" id="id_model_name" value="{{ form.model_name.value|default_if_none:'' }}">
                 </div>
                 <div class="mb-3">
+                    <label for="id_clustering_algorithm" class="form-label">Clustering Algorithm</label>
+                    <select name="clustering_algorithm" class="form-select" id="id_clustering_algorithm">
+                        <option value="kmeans">K-Means</option>
+                        <option value="em">Expectation Maximization</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="id_num_clusters" class="form-label">Number of Clusters (Default: 3)</label>
+                    <input type="number" name="num_clusters" class="form-control" id="id_num_clusters" value="{{ default_clusters }}">
+                </div>
+                <div class="mb-3">
                     <label for="id_scores_file" class="form-label">{{ form.scores_file.label }}</label>
                     <input type="file" name="scores_file" class="form-control" id="id_scores_file">
                 </div>

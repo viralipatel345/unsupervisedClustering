@@ -37,10 +37,11 @@ class SignUpForm(UserCreationForm):
 class ModelUploadForm(forms.ModelForm):
     scores_file = forms.FileField(required=False)
     scores_text = forms.CharField(widget=forms.Textarea, required=False)
+    clustering_algorithm = forms.ChoiceField(choices=UserModel.CLUSTERING_ALGORITHMS, label="Clustering Algorithm", required=True)
 
     class Meta:
         model = UserModel
-        fields = ['model_name']
+        fields = ['model_name', 'clustering_algorithm']
 
     def clean(self):
         cleaned_data = super().clean()

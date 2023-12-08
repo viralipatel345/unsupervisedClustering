@@ -11,6 +11,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
 from joblib import dump, load
 from io import StringIO, BytesIO
 
@@ -76,7 +77,7 @@ def parse_scores(text):
             raise ValueError("Invalid format in scores data.")
     return np.array(scores)
 
-def upload_model(request):
+def upload_model(request, default_clusters=3):
     if request.method == 'POST':
         form = ModelUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -90,24 +91,32 @@ def upload_model(request):
                     scores_text = form.cleaned_data['scores_text']
                 scores_array = parse_scores(scores_text)
 
-                n_clusters = 3
-                if scores_array.shape[0] < n_clusters:
-                    raise ValueError(f"Not enough samples to form {n_clusters} clusters.")
-                kmeans = KMeans(n_clusters)
-                kmeans.fit(scores_array)
+                clustering_algorithm = form.cleaned_data['clustering_algorithm']
+
+                num_clusters = int(request.POST.get('num_clusters', default_clusters))
+                if scores_array.shape[0] < num_clusters:
+                    raise ValueError(f"Not enough samples to form {num_clusters} clusters or components.")
+                if clustering_algorithm == 'kmeans':
+                    model = KMeans(n_clusters=num_clusters)
+                    model.fit(scores_array)
+                    centers = model.cluster_centers_
+                elif clustering_algorithm == 'em':
+                    model = GaussianMixture(n_components=num_clusters)
+                    model.fit(scores_array)
+                    centers = model.means_
 
                 user_model = UserModel()
                 user_model.user = request.user
                 user_model.model_name = form.cleaned_data['model_name']
-                user_model.kmeans_centers = kmeans.cluster_centers_.tolist()
+                user_model.centers = centers.tolist()
 
                 model_filename = f"user_{request.user.id}_model_{user_model.id}.joblib"
                 model_file_path = os.path.join(settings.MODEL_FILE_PATH, model_filename)
-                dump(kmeans, model_file_path)
+                dump(model, model_file_path)
 
                 user_model.model_file = model_file_path
                 user_model.save()
-                messages.success(request, "Model uploaded successfully")
+                messages.success(request, "Model Uploaded Successfully!")
                 return redirect('home')
             except Exception as e:
                 messages.error(request, f"Error processing file: {e}")
@@ -136,16 +145,17 @@ def test_model(request):
                     test_scores_array = test_scores_array.reshape(-1, 1)
 
                 model_file_path = selected_model.model_file
-                kmeans = load(model_file_path)
-                predictions = kmeans.predict(test_scores_array)
+                model = load(model_file_path)
+
+                predictions = model.predict(test_scores_array)
 
                 plt.figure(figsize=(8, 6))
                 if test_scores_array.shape[1] == 1:
                     plt.scatter(test_scores_array[:, 0], np.zeros_like(test_scores_array[:, 0]), c=predictions, cmap='viridis', marker='o')
                 else:
                     plt.scatter(test_scores_array[:, 0], test_scores_array[:, 1], c=predictions, cmap='viridis', marker='o')
-                if selected_model.kmeans_centers:
-                    centers = np.array(selected_model.kmeans_centers)
+                if selected_model.centers:
+                    centers = np.array(selected_model.centers)
                     if centers.ndim == 1 or centers.shape[1] == 1:
                         plt.scatter(centers, np.zeros_like(centers), c='red', marker='x')
                     else:

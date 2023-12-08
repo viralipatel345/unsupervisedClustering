@@ -14,9 +14,14 @@ class UserInformation(models.Model):
         verbose_name_plural = "UserInformation"
 
 class UserModel(models.Model):
+    CLUSTERING_ALGORITHMS = (
+        ('kmeans', 'K-Means'),
+        ('em', 'Expectation Maximization'),
+    )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    model_name = models.CharField(max_length=100)
-    kmeans_centers = models.JSONField(null=True)
+    model_name = models.CharField(max_length=100, unique=True)
+    clustering_algorithm = models.CharField(max_length=10, choices=CLUSTERING_ALGORITHMS, default='kmeans')
+    centers = models.JSONField(null=True)
     model_file = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
